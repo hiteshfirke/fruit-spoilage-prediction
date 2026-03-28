@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Banana Ripeness & Spoilage Prediction System</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Main stylesheet -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='main.css') }}">
+</head>
+<body>
+
+<div class="page-shell">
+
+    <!-- Top bar -->
+    <header class="top-bar">
+        <div class="project-meta">
+            <span class="project-tag">PROJECT · EDI / ML</span>
+            <h1 class="project-title">Banana Ripeness &amp; Spoilage Prediction System</h1>
+        </div>
+
+        <div class="prototype-pill">
+            <span class="pill-label">Research Prototype</span>
+        </div>
+    </header>
+
+    <!-- Main content layout -->
+    <main class="layout">
+
+        <!-- LEFT: Prediction card -->
+        <section class="card prediction-card">
+            <div class="card-header">
+                <h2>PREDICTION INTERFACE</h2>
+                <p class="card-subtitle">
+                    Upload a banana sample, provide environmental conditions, and obtain predicted
+                    ripeness stage with exact estimated days left.
+                </p>
+            </div>
+
+            <form id="predict-form" class="predict-form" enctype="multipart/form-data">
+
+                <!-- Model badge row -->
+                <div class="model-pill-row">
+                    <div class="model-pill">
+                        <span class="model-name">MOBILENETV2</span>
+                        <span class="model-sub">TensorFlow · 4-stage classifier</span>
+                    </div>
+                    <div class="model-status">
+                        <span class="dot"></span>
+                        <span class="status-text">Model ready · using latest MobileNetV2 weights</span>
+                    </div>
+                </div>
+
+                <!-- File input -->
+                <div class="field-group">
+                    <label class="field-label">Banana Image</label>
+                    <div class="file-input-row">
+                    <label for="image" class="custom-file-btn">📁 Choose Image</label>
+                    <span id="file-name" class="file-name">No file chosen</span>
+                    <input type="file" name="image" id="image" accept="image/*" required hidden>
+                </div>
+
+                    <p class="hint">
+                        Prefer top/side view, single fruit or bunch, under normal lighting.
+                    </p>
+                </div>
+
+                <!-- Temp / Humidity -->
+                <div class="field-row">
+                    <div class="field-group">
+                        <label class="field-label">Temperature (°C)</label>
+                        <input type="number" step="0.1" name="temperature" id="temperature"
+                               placeholder="e.g. 24" required>
+                    </div>
+
+                    <div class="field-group">
+                        <label class="field-label">Humidity (%)</label>
+                        <input type="number" step="1" name="humidity" id="humidity"
+                               placeholder="e.g. 50" required>
+                    </div>
+                </div>
+
+                <!-- Action row -->
+                <div class="action-row">
+                    <button type="submit" class="primary-btn" id="run-btn">
+                        Run Prediction
+                    </button>
+                    <span class="tiny-status" id="tiny-status">Awaiting input…</span>
+                </div>
+            </form>
+        </section>
+
+        <!-- RIGHT: Output card -->
+        <section class="card output-card">
+            <div class="card-header">
+                <h2>MODEL OUTPUT</h2>
+                <p class="card-subtitle">
+                    Prediction summary, confidence, and estimated remaining shelf-life.
+                </p>
+            </div>
+
+            <div id="result-box" class="result-box empty">
+                <!-- Default (no prediction yet) -->
+                <div class="result-placeholder">
+                    <div class="emoji">🍌</div>
+                    <h3>No prediction yet</h3>
+                    <p>Use the form on the left to upload a sample and run the model.</p>
+                </div>
+            </div>
+
+            <p class="foot-note">
+                Note: Days remaining are adjusted by an environment-based spoilage model using
+                the provided temperature and humidity.
+            </p>
+        </section>
+    </main>
+
+</div>
+
+<!-- Front-end logic -->
+<script>
+    const imageInput = document.getElementById("image");
+const fileNameLabel = document.getElementById("file-name");
+
+imageInput.addEventListener("change", () => {
+    if (imageInput.files.length > 0) {
+        fileNameLabel.textContent = imageInput.files[0].name;
+    } else {
+        fileNameLabel.textContent = "No file chosen";
+    }
+});
+
+document.addEventListener("DOMContentLoaded", () => {
+    const form  = document.getElementById("predict-form");
+    const output = document.getElementById("result-box");    // <-- correct id
+    const runBtn = document.getElementById("run-btn");
+    const tinyStatus = document.getElementById("tiny-status");
+
+    if (!form || !output) {
+        console.error("Form or result-box not found in DOM");
+        return;
+    }
+
+    form.addEventListener("submit", async (e) => {
+        e.preventDefault();
+
+        // UI: loading state
+        if (runBtn) {
+            runBtn.disabled = true;
+        }
+        if (tinyStatus) {
+            tinyStatus.textContent = "Running prediction…";
+        }
+
+        output.classList.remove("empty");
+        output.innerHTML = `
+            <div class="result-box-inner loading">
+                <div class="result-header">
+                    <div class="spinner"></div>
+                    <span>Running prediction…</span>
+                </div>
+            </div>
+        `;
+
+        const formData = new FormData(form);
+
+        try {
+            const res = await fetch("/predict", {
+                method: "POST",
+                body: formData
+            });
+
+            const data = await res.json();
+            console.log("[DEBUG] /predict response:", data);
+
+            if (!res.ok || data.error) {
+                throw new Error(data.error || "Server error");
+            }
+
+            // --- Extract values safely ---
+            const stageRaw = data.stage_label || "unknown_stage";
+
+            // map backend label to display text
+            // map backend label to display text
+const stageMap = {
+    "stage0_unripe": "STAGE0 UNRIPE",
+    "stage1_ripe": "STAGE1 RIPE",
+    "stage2_overripe": "STAGE2 OVER-RIPE / SPOTTED",
+    "stage3_rotten": "STAGE3 ROTTEN / WASTE"
+};
+const stageLabel = stageMap[stageRaw] || stageRaw.toUpperCase();
+
+// choose a colour theme based on stage
+const stageClassMap = {
+    "stage0_unripe":  "stage-unripe",
+    "stage1_ripe":    "stage-ripe",
+    "stage2_overripe":"stage-overripe",
+    "stage3_rotten":  "stage-rotten"
+};
+const stageClass = stageClassMap[stageRaw] || "stage-unknown";
+
+const confRaw = Number.isFinite(data.confidence) ? data.confidence : 0;
+const confPct = (confRaw * 100).toFixed(1);  // e.g. "93.2"
+
+const daysVal = Number.isFinite(data.days_exact)
+    ? data.days_exact
+    : (Number.isFinite(data.days_left) ? data.days_left : 0);
+const daysText = `${daysVal.toFixed(1)} days`;
+
+const tVal = Number.isFinite(data.temperature) ? data.temperature : 0;
+const hVal = Number.isFinite(data.humidity) ? data.humidity : 0;
+
+// tiny 4-step bar – highlight the current stage
+const s0 = stageRaw === "stage0_unripe"   ? "active" : "";
+const s1 = stageRaw === "stage1_ripe"     ? "active" : "";
+const s2 = stageRaw === "stage2_overripe" ? "active" : "";
+const s3 = stageRaw === "stage3_rotten"   ? "active" : "";
+
+output.innerHTML = `
+    <div class="result-box-inner success ${stageClass}">
+        <div class="result-top-row">
+            <div class="result-header">
+                <div class="result-icon">🍌</div>
+                <div>
+                    <div class="result-kicker">PREDICTED RIPENESS STAGE</div>
+                    <div class="result-stage">${stageLabel}</div>
+                    <div class="stage-pill">
+                        <span class="pill-dot"></span>
+                        <span class="pill-text">Vision model · MobileNetV2</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="ripeness-bar">
+                <div class="ripeness-label">Ripeness progression</div>
+                <div class="ripeness-steps">
+                    <div class="step ${s0}">Unripe</div>
+                    <div class="step ${s1}">Ripe</div>
+                    <div class="step ${s2}">Over-ripe</div>
+                    <div class="step ${s3}">Rotten</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="result-metrics fancy-metrics">
+            <div class="metric-chip">
+                <div class="metric-label">CONFIDENCE</div>
+                <div class="metric-value">${confPct} %</div>
+                <div class="metric-sub">Model certainty for this stage</div>
+            </div>
+            <div class="metric-chip">
+                <div class="metric-label">ESTIMATED SHELF-LIFE</div>
+                <div class="metric-value">${daysText}</div>
+                <div class="metric-sub">Approx. days before spoilage</div>
+            </div>
+            <div class="metric-chip">
+                <div class="metric-label">TEMPERATURE</div>
+                <div class="metric-value">${tVal.toFixed(1)} °C</div>
+                <div class="metric-sub">Current ambient temperature</div>
+            </div>
+            <div class="metric-chip">
+                <div class="metric-label">HUMIDITY</div>
+                <div class="metric-value">${hVal.toFixed(0)} %</div>
+                <div class="metric-sub">Current ambient humidity</div>
+            </div>
+        </div>
+
+        <p class="result-note">
+            Note: Days remaining are adjusted by an environment-based spoilage model
+            using the provided temperature and humidity.
+        </p>
+    </div>
+`;
+
+
+            if (tinyStatus) {
+                tinyStatus.textContent = "Prediction successful";
+            }
+
+        } catch (err) {
+            console.error("[ERROR] Prediction failed:", err);
+            output.innerHTML = `
+                <div class="result-box-inner error">
+                    <div class="result-header">
+                        <div class="result-icon">⚠️</div>
+                        <div>
+                            <div class="result-stage">Prediction failed</div>
+                            <div class="result-kicker">Server error (500)</div>
+                        </div>
+                    </div>
+                    <p class="result-note">
+                        Please recheck your input and try again. See console for details.
+                    </p>
+                </div>
+            `;
+            if (tinyStatus) {
+                tinyStatus.textContent = "Prediction failed";
+            }
+        } finally {
+            if (runBtn) {
+                runBtn.disabled = false;
+            }
+        }
+    });
+});
+</script>
+</body>
+</html>

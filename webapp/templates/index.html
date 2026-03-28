@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fruit Spoilage Prediction System – Research Prototype</title>
+
+    <!-- Link to CSS in /static/index.css -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='index.css') }}">
+</head>
+<body>
+
+    <!-- Background Video -->
+    <video autoplay muted loop playsinline class="bg-video">
+        <source src="{{ url_for('static', filename='fruit_store_bg.mp4') }}" type="video/mp4">
+    </video>
+
+    <!-- Dark / gradient overlay on top of video -->
+    <div class="page-overlay"></div>
+
+    <!-- Main hero content -->
+    <main class="hero-shell">
+        <section class="hero-card">
+
+            <div class="hero-tag">
+                FRUIT SPOILAGE DETECTION · COMPUTER VISION + ENVIRONMENT FUSION
+            </div>
+
+            <h1 class="hero-title">
+                Fruit Spoilage <span>Prediction System</span>
+            </h1>
+
+            <p class="hero-subtitle">
+                A research-grade prototype combining <strong>MobileNetV2</strong> image classification
+                with <strong>temperature–humidity based biological ripening modelling</strong>,
+                for real-time spoilage estimation of bananas and multi-fruit batches.
+            </p>
+
+            <!-- Small research stats / badges -->
+            <div class="hero-meta-row">
+                <div class="meta-pill">
+                    <span class="meta-label">Model</span>
+                    <span class="meta-value">MobileNetV2</span>
+                </div>
+                <div class="meta-pill">
+                    <span class="meta-label">Stages</span>
+                    <span class="meta-value">Unripe · Ripe · Overripe · Rotten</span>
+                </div>
+                <div class="meta-pill">
+                    <span class="meta-label">Inputs</span>
+                    <span class="meta-value">Image + Temp + Humidity</span>
+                </div>
+            </div>
+
+<!-- Buttons -->
+            <div class="hero-actions">
+
+    <!-- Primary “Proceed” button as a link -->
+    <a href="{{ url_for('main_page') }}" class="btn-primary hero-btn">
+        <span class="btn-label"> Proceed </span>
+        <span class="btn-glow"></span>
+    </a>
+
+    <!-- Secondary ghost button (still a normal button) -->
+    <a href="{{ url_for('architecture_page') }}" class="btn-ghost">
+    View Architecture
+</a>
+
+
+</div>
+
+
+            <!-- Footer text -->
+            <p class="hero-footer">
+                Developed as part of <strong>EDI Project · VIT Pune</strong> · Using
+                <strong>TensorFlow</strong>, <strong>MobileNetV2</strong>, and a
+                <strong>custom ripening curve model</strong>.
+            </p>
+
+        </section>
+
+        <!-- Scroll hint -->
+        <div class="scroll-indicator">
+            <span class="dot"></span>
+            <span class="label">Scroll not required · One-screen intro</span>
+        </div>
+    </main>
+
+</body>
+</html>

@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Model & Research Architecture – Fruit Spoilage System</title>
+
+    <!-- Architecture-specific CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='architecture.css') }}">
+</head>
+<body>
+
+    <!-- Subtle gradient background glow -->
+    <div class="bg-glow bg-glow-1"></div>
+    <div class="bg-glow bg-glow-2"></div>
+
+    <header class="page-header">
+        <p class="page-tag">Research View · Internal Review Only</p>
+        <h1>Model & Research Architecture</h1>
+        <p class="page-subtitle">
+            Dataset summary, training pipeline, and reviewer-focused methodology for the
+            <span>Fruit Spoilage Prediction System</span>.
+        </p>
+    </header>
+
+    <main class="content-shell">
+
+        <!-- Left small column: high-level stats / pipeline -->
+        <section class="side-column">
+
+            <div class="mini-card">
+                <h3 class="mini-title">System Overview</h3>
+                <div class="pill-row">
+                    <span class="pill">4 ripeness stages</span>
+                    <span class="pill">10k+ images</span>
+                    <span class="pill">MobileNetV2 backbone</span>
+                </div>
+                <ul class="mini-list">
+                    <li><strong>Input:</strong> Banana image + ambient temperature + humidity.</li>
+                    <li><strong>Vision head:</strong> CNN classifier → ripeness stage.</li>
+                    <li><strong>Fusion head:</strong> Rule-based spoilage model → days remaining.</li>
+                    <li><strong>Output:</strong> Stage label + confidence + estimated shelf life.</li>
+                </ul>
+            </div>
+
+            <div class="timeline-card">
+                <h3 class="mini-title">Pipeline Timeline</h3>
+                <ol class="timeline">
+                    <li>
+                        <span class="dot"></span>
+                        <div>
+                            <h4>Data Curation</h4>
+                            <p>Mix of open-source + captured images across stages, lighting & backgrounds.</p>
+                        </div>
+                    </li>
+                    <li>
+                        <span class="dot"></span>
+                        <div>
+                            <h4>Pre-processing</h4>
+                            <p>Resize to 224×224, apply MobileNetV2 preprocessing & heavy augmentation.</p>
+                        </div>
+                    </li>
+                    <li>
+                        <span class="dot"></span>
+                        <div>
+                            <h4>Training</h4>
+                            <p>Frozen backbone, dense head with Adam + class-weighted loss & early stopping.</p>
+                        </div>
+                    </li>
+                    <li>
+                        <span class="dot"></span>
+                        <div>
+                            <h4>Deployment</h4>
+                            <p>SavedModel → TFLite → Flask web demo with on-device inference.</p>
+                        </div>
+                    </li>
+                </ol>
+            </div>
+
+        </section>
+
+        <!-- Right main column: the two big cards you already had -->
+        <section class="main-column">
+
+            <!-- MODEL & DATASET SUMMARY -->
+            <article class="card fade-in">
+                <header class="card-header">
+                    <div class="card-title-row">
+                        <h2>Model & Dataset Summary</h2>
+                        <span class="badge badge-success">92.6% test accuracy</span>
+                    </div>
+                    <div class="metric-row">
+                        <div class="metric">
+                            <span class="metric-label">Ripeness Stages</span>
+                            <span class="metric-value">4</span>
+                        </div>
+                        <div class="metric">
+                            <span class="metric-label">Training Images</span>
+                            <span class="metric-value">10k+</span>
+                        </div>
+                        <div class="metric">
+                            <span class="metric-label">Backbone</span>
+                            <span class="metric-value">MobileNetV2</span>
+                        </div>
+                    </div>
+                </header>
+
+                <ul class="card-list">
+                    <li><strong>Backbone:</strong> MobileNetV2 pre-trained on ImageNet, used as a frozen feature extractor.</li>
+                    <li><strong>Task:</strong> 4-class banana ripeness classification – <code>stage0_unripe</code>,
+                        <code>stage1_ripe</code>, <code>stage2_overripe</code>, <code>stage3_rotten</code>.</li>
+                    <li><strong>Dataset:</strong> Mix of curated open-source images plus in-house captures
+                        across multiple backgrounds, camera angles, and lighting conditions.</li>
+                    <li><strong>Augmentation:</strong> random flip, rotation, zoom, brightness & contrast jitter,
+                        simulating real-world conditions (side views, bunches, partial occlusion).</li>
+                    <li><strong>Class imbalance:</strong> handled via computed <em>class weights</em> per category in
+                        the loss function.</li>
+                    <li><strong>Evaluation:</strong> final MobileNetV2 head achieves ≈<strong>92.6%</strong> accuracy
+                        on a held-out test set.</li>
+                </ul>
+
+                <p class="card-footnote">
+                    Vision output (ripeness stage) is later fused with an environment-based spoilage model
+                    (temperature &amp; humidity) to estimate <strong>days remaining</strong>.
+                </p>
+            </article>
+
+            <!-- METHODOLOGY -->
+            <article class="card fade-in delay-1">
+                <header class="card-header">
+                    <div class="card-title-row">
+                        <h2>Methodology (For Reviewers)</h2>
+                        <span class="badge badge-neutral">Reproducibility Notes</span>
+                    </div>
+                </header>
+
+                <ol class="steps-list">
+                    <li>
+                        <h3>1. Image acquisition</h3>
+                        <p>
+                            Curated dataset + in-house captures of bananas at different ripening stages,
+                            with variation in background, distance, device, and lighting. Includes both
+                            single fruit and small bunch scenarios.
+                        </p>
+                    </li>
+                    <li>
+                        <h3>2. Pre-processing</h3>
+                        <p>
+                            Resize to 224×224, apply MobileNetV2 preprocessing, and strong data augmentation
+                            (flip, rotation, zoom, brightness/contrast) to improve generalisation to noisy phone photos.
+                        </p>
+                    </li>
+                    <li>
+                        <h3>3. Training</h3>
+                        <p>
+                            Freeze the MobileNetV2 backbone, train a dense classification head using Adam,
+                            early stopping on validation loss, and class-weighted categorical cross-entropy
+                            to balance under-represented stages.
+                        </p>
+                    </li>
+                    <li>
+                        <h3>4. Post-processing</h3>
+                        <p>
+                            Brightness-based heuristic distinguishes “dark background” vs “truly black / rotten banana”
+                            for borderline predictions, avoiding false “rotten” on under-exposed images.
+                        </p>
+                    </li>
+                    <li>
+                        <h3>5. Environmental fusion</h3>
+                        <p>
+                            A simple biological spoilage model uses ambient temperature &amp; humidity to convert the
+                            predicted stage into an estimated <strong>days remaining</strong> range, based on
+                            empirical ripening behaviour.
+                        </p>
+                    </li>
+                </ol>
+            </article>
+        </section>
+
+    </main>
+
+    <!-- Footer Actions -->
+    <footer class="page-footer">
+        <a href="{{ url_for('starter_page') }}" class="footer-btn footer-btn-primary">
+            ⬅ Back to Starter Page
+        </a>
+        <a href="{{ url_for('main_page') }}" class="footer-btn footer-btn-ghost">
+            Go to Predictor UI →
+        </a>
+    </footer>
+
+</body>
+</html>
