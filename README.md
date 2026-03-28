@@ -91,7 +91,7 @@ fruit-spoilage-prediction/
 
 ### 1. Clone the Repository
 ```bash
-git clone https://github.com/YOUR_USERNAME/fruit-spoilage-prediction.git
+git clone https://github.com/hiteshfirke/fruit-spoilage-prediction.git
 cd fruit-spoilage-prediction
 ```
 
@@ -159,14 +159,14 @@ pillow
 
 ## 👥 Team
 
-| Name | Role |
-|---|---|
-| **Hitesh Firke** | ML Model & Training |
-| **Kapil Hire** | Team Member |
-| **Harsh Dhavane** | Team Member |
-| **Varad Hivarkar** | Team Member |
+| Name | Role | GitHub |
+|---|---|---|
+| **Hitesh Firke** | 🤖 ML Model & Training (MobileNetV2, TFLite export) | [@hiteshfirke](https://github.com/hiteshfirke) |
+| **Kapil Hire** | 🗃️ Data Processing & Cleaning | [@kapilhire9b30-spec](https://github.com/kapilhire9b30-spec) |
+| **Harsh Dhavane** | ⚙️ Backend Development (Flask API) | — |
+| **Varad Hivarkar** | 🎨 Frontend Development (Web UI) | [@varadhivarkar1703-create](https://github.com/varadhivarkar1703-create) |
 
-> EDI Project · VIT Pune
+> 📍 EDI Project · VIT Pune
 
 ---
 
