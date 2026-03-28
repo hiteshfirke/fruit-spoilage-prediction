@@ -55,10 +55,6 @@ The predicted ripeness stage is passed into a **biological spoilage model** that
 | 🏷️ Classes | 4 |
 | 📦 Export Formats | `.keras` + `.tflite` |
 
-### Training vs Validation Accuracy
-
-![Training vs Validation Accuracy](training_vs_validation_accuracy.png)
-
 ---
 
 ## 🗂️ Project Structure
@@ -104,12 +100,16 @@ cd fruit-spoilage-prediction
 pip install -r requirements.txt
 ```
 
-### 3. Download the Dataset
-The dataset (~3GB of banana images) is not included in this repo due to size.
+### 3. Download the Dataset & Models
 
-📦 **Download here:** [Google Drive / Kaggle Link — add your link here]
+The dataset (~3GB) and trained models are hosted on Google Drive:
 
-Place it in the following structure:
+| Resource | Link |
+|---|---|
+| 📦 Dataset (train + test images) | [Download Dataset](https://drive.google.com/drive/folders/1jmotbTl6SgwfY8xO_zoweEyzHaWSUDd5?usp=sharing) |
+| 🤖 Trained Models (.keras + .tflite) | [Download Models](https://drive.google.com/drive/folders/1rsemmmg1gTb2HdEGNugSjHfJ1rKOR_cb?usp=sharing) |
+
+Place the dataset in the following structure:
 ```
 dataset/
 ├── train/
@@ -124,7 +124,10 @@ dataset/
     └── stage3_rotten/
 ```
 
-### 4. Train the Model
+Place the downloaded `.keras` and `.tflite` files inside the `dataset/` folder.
+
+### 4. Train the Model (Optional)
+> Skip this step if you downloaded the pre-trained models above.
 ```bash
 python train_mobilenet.py
 ```
