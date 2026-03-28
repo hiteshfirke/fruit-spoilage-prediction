@@ -8,7 +8,7 @@
 
 This project is a full-stack AI web application that classifies bananas into **4 ripeness stages** from a photo and estimates **days remaining before spoilage** by combining the vision model output with ambient **temperature** and **humidity** readings.
 
-Built as part of the **EDI Project at VIT Pune**, this system demonstrates how transfer learning and environmental modelling can be combined for real-world food quality monitoring.
+Built as part of the **EDI (Entrepreneurship, Development & Innovation) Project at VIT Pune**, this system demonstrates how transfer learning and environmental modelling can be combined for real-world food quality monitoring.
 
 ---
 
@@ -173,13 +173,13 @@ pillow
 | **Harsh Dhavane** | ⚙️ Backend Development (Flask API) | — |
 | **Varad Hivarkar** | 🎨 Frontend Development (Web UI) | [@varadhivarkar1703-create](https://github.com/varadhivarkar1703-create) |
 
-> 📍 EDI Project · VIT Pune
+> 📍 EDI (Entrepreneurship, Development & Innovation) · VIT Pune
 
 ---
 
 ## 📄 License
 
-This project is for academic/research purposes as part of VIT Pune's EDI programme.
+This project is for academic/research purposes as part of VIT Pune's EDI (Entrepreneurship, Development & Innovation) programme.
 
 ---
 
@@ -187,4 +187,4 @@ This project is for academic/research purposes as part of VIT Pune's EDI program
 
 - [MobileNetV2](https://arxiv.org/abs/1801.04381) — Google Brain
 - TensorFlow / Keras
-- VIT Pune — EDI Programme
+- VIT Pune — EDI (Entrepreneurship, Development & Innovation) Programme
