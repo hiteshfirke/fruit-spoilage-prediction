@@ -55,6 +55,10 @@ The predicted ripeness stage is passed into a **biological spoilage model** that
 | 🏷️ Classes | 4 |
 | 📦 Export Formats | `.keras` + `.tflite` |
 
+### Training vs Validation Accuracy
+
+![Training vs Validation Accuracy](training_vs_validation_accuracy.png)
+
 ---
 
 ## 🗂️ Project Structure
